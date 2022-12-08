@@ -10,7 +10,6 @@
 #define MTS_STEPPER_TYPE_64 1
 
 
-
 enum MTS_STEPPER_ID {
     MTS_STEPPER_1 = 0,
     MTS_STEPPER_2,
@@ -23,26 +22,16 @@ enum MTS_STEPPER_STEP_TYPE {
     MTS_STEPPER_HALF_STEP
 };
 
-enum MTS_STEPPER_PHASE {
-    MTS_STEPPER_PHASE_1 = 0,
-    MTS_STEPPER_PHASE_2,
-    MTS_STEPPER_PHASE_3,
-    MTS_STEPPER_PHASE_4,
-    MTS_STEPPER_PHASE_5,
-    MTS_STEPPER_PHASE_6,
-    MTS_STEPPER_PHASE_7,
-    MTS_STEPPER_PHASE_8
-};
-
-
 typedef std::function<void(uint8_t, uint8_t)> processStepHandler;
 
 class MtsStepper
 {
 private:
-
     void DeterminePeriodOfNextStep();
-    //void setNextFullStep();
+    processStepHandler processStep = nullptr;
+    MTS_STEPPER_STEP_TYPE _stepType;
+    uint8_t _stepperType;
+    void setNextStep();
 
     int8_t _stepPhase;
     float _stepsPerMillimeter;
@@ -64,7 +53,6 @@ private:
 
 public:
     MtsStepper();
-    processStepHandler processStep = nullptr;
 
     /*
     Sets the stepsPerRevolution for the appropriate stepper type
@@ -72,10 +60,7 @@ public:
     MTS_STEPPER_TYPE_16 = 513
     */
     void setType(int type);
-    void setCallback(processStepHandler fn) { processStep = fn; }
 
-    void setStepsPerRevolution(float motorStepPerRevolution);
-    void setStepsPerMillimeter(float motorStepPerMillimeter);
 
     // Functions which use Steps
 
@@ -83,25 +68,63 @@ public:
     void setAccelerationInStepsPerSecondPerSecond(float accelerationInStepsPerSecondPerSecond);
     void setCurrentPositionInSteps(long currentPositionInSteps);
     long getCurrentPositionInSteps();
-    //void moveRelativeInSteps(long distanceToMoveInSteps);
-    //void setTargetPositionRelativeInSteps(long distanceToMoveInSteps);
-    //void moveToPositionInSteps(long absolutePositionToMoveToInSteps);
-    //void setTargetPositionInSteps(long absolutePositionToMoveToInSteps);
-    //void setTargetPositionToStop();
-    //float getCurrentVelocityInStepsPerSecond();
-
-    //bool moveToHomeInSteps(long directionTowardHome, float speedInStepsPerSecond, long maxDistanceToMoveInSteps, int homeSwitchPin);
+    void setTargetPositionRelativeInSteps(long distanceToMoveInSteps);
+    void setTargetPositionInSteps(long absolutePositionToMoveToInSteps);
+    float getCurrentVelocityInStepsPerSecond();
 
 
-    //void deadStop();
+    // Functions which use millimeters
 
+    void setStepsPerMillimeter(float motorStepPerMillimeter);
+    float getCurrentPositionInMillimeters();
+    void setCurrentPositionInMillimeters(float currentPositionInMillimeters);
+    void setSpeedInMillimetersPerSecond(float speedInMillimetersPerSecond);
+    void setAccelerationInMillimetersPerSecondPerSecond(float accelerationInMillimetersPerSecondPerSecond);
+    bool moveToHomeInMillimeters(long directionTowardHome, float speedInMillimetersPerSecond, long maxDistanceToMoveInMillimeters, int homeLimitSwitchPin);
+    void setTargetPositionRelativeInMillimeters(float distanceToMoveInMillimeters);
+    void setTargetPositionInMillimeters(float absolutePositionToMoveToInMillimeters);
+    float getCurrentVelocityInMillimetersPerSecond();
+
+
+    // Functions which use revolutions
+
+    void setStepsPerRevolution(float motorStepPerRevolution);
+    void setCurrentPositionInRevolutions(float currentPositionInRevolutions);
+    float getCurrentPositionInRevolutions();
+    void setSpeedInRevolutionsPerSecond(float speedInRevolutionsPerSecond);
+    void setAccelerationInRevolutionsPerSecondPerSecond(float accelerationInRevolutionsPerSecondPerSecond);
+    bool moveToHomeInRevolutions(long directionTowardHome, float speedInRevolutionsPerSecond, long maxDistanceToMoveInRevolutions, int homeLimitSwitchPin);
+    void setTargetPositionRelativeInRevolutions(float distanceToMoveInRevolutions);
+    void setTargetPositionInRevolutions(float absolutePositionToMoveToInRevolutions);
+    float getCurrentVelocityInRevolutionsPerSecond();
+
+
+
+    // General Functions
+
+    //Returns true when move is complete
     bool motionComplete();
 
     /*
-    DO NOT CALL THIS! It is used by MultiTinyStepper
-    returns true and sets the currentStepPhase if a move is required
-    returns false if no move is required
+    Acts as a way to calibrate a home position based on a switch.
+    Max distance acts as a safty.
+    This will block until complete.
     */
-    //bool processStep(int8_t &currentStepPhase);
+    bool moveToHomeInSteps(long directionTowardHome, float speedInStepsPerSecond, long maxDistanceToMoveInSteps, int homeSwitchPin);
+
+    //Stops the stepper immediatly.
+    void deadStop();
+
+    //Turn off the current to the motor
+    void disable();
+
+    //Call this when needing to move.  Returns true if movement complete. 
+    bool process();
+
+
+    /*
+    DO NOT CALL THIS! It is used by MultiTinyStepper
+    */
+    void setCallback(processStepHandler fn) { processStep = fn; }
 };
 

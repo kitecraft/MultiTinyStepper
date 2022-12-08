@@ -1,9 +1,9 @@
 #include "MtsStepper.h"
 
-
 MtsStepper::MtsStepper()
 {
-    _stepsPerRevolution = 4076L;
+    _stepType = MTS_STEPPER_FULL_STEP;
+    _stepsPerRevolution = MTS_STEPPER_TYPE_16_REV;
     _stepsPerMillimeter = 25.0;
     _directionOfMotion = 0;
     _currentPosition_InSteps = 0L;
@@ -14,6 +14,18 @@ MtsStepper::MtsStepper()
     _nextStepPeriod_InUS = 0.0;
 }
 
+void MtsStepper::setType(int type)
+{
+    if (type == MTS_STEPPER_TYPE_64) {
+        _stepsPerRevolution = MTS_STEPPER_TYPE_64_REV;
+    }
+
+    _stepsPerRevolution = MTS_STEPPER_TYPE_16_REV;
+    _stepperType = type;
+}
+
+
+// Steps
 
 void MtsStepper::setSpeedInStepsPerSecond(float speedInStepsPerSecond)
 {
@@ -30,37 +42,6 @@ void MtsStepper::setAccelerationInStepsPerSecondPerSecond(float accelerationInSt
     _minimumPeriodForAStoppedMotion = _periodOfSlowestStep_InUS / 2.8;
 }
 
-
-bool MtsStepper::motionComplete()
-{
-    if ((_directionOfMotion == 0) && (_currentPosition_InSteps == _targetPosition_InSteps))
-    {
-        return(true);
-    }
-    
-    return(false);
-}
-
-void MtsStepper::setType(int type)
-{
-    if (type == MTS_STEPPER_TYPE_64) {
-        _stepsPerRevolution = MTS_STEPPER_TYPE_64_REV;
-    }
-
-    _stepsPerRevolution = MTS_STEPPER_TYPE_16_REV;
-}
-
-
-void MtsStepper::setStepsPerRevolution(float motorStepPerRevolution)
-{
-    _stepsPerRevolution = motorStepPerRevolution;
-}
-
-void MtsStepper::setStepsPerMillimeter(float motorStepsPerMillimeter)
-{
-    _stepsPerMillimeter = motorStepsPerMillimeter;
-}
-
 void MtsStepper::setCurrentPositionInSteps(long currentPositionInSteps)
 {
     _currentPosition_InSteps = currentPositionInSteps;
@@ -71,6 +52,161 @@ long MtsStepper::getCurrentPositionInSteps()
     return(_currentPosition_InSteps);
 }
 
+void MtsStepper::setTargetPositionRelativeInSteps(long distanceToMoveInSteps)
+{
+    setTargetPositionInSteps(_currentPosition_InSteps + distanceToMoveInSteps);
+}
+
+void MtsStepper::setTargetPositionInSteps(long absolutePositionToMoveToInSteps)
+{
+    _targetPosition_InSteps = absolutePositionToMoveToInSteps;
+}
+
+float MtsStepper::getCurrentVelocityInStepsPerSecond()
+{
+    if (_currentStepPeriod_InUS == 0.0) {
+        return(0);
+    }   
+    else {
+        if (_directionOfMotion > 0) {
+            return(1000000.0 / _currentStepPeriod_InUS);
+        }
+        else {
+            return(-1000000.0 / _currentStepPeriod_InUS);
+        }
+    }
+}
+
+
+
+// Millimeters
+
+void MtsStepper::setStepsPerMillimeter(float motorStepsPerMillimeter)
+{
+    _stepsPerMillimeter = motorStepsPerMillimeter;
+}
+
+float MtsStepper::getCurrentPositionInMillimeters()
+{
+    return((float)getCurrentPositionInSteps() / _stepsPerMillimeter);
+}
+
+
+void MtsStepper::setCurrentPositionInMillimeters(float currentPositionInMillimeters)
+{
+    setCurrentPositionInSteps((long)round(currentPositionInMillimeters * _stepsPerMillimeter));
+}
+
+void MtsStepper::setSpeedInMillimetersPerSecond(float speedInMillimetersPerSecond)
+{
+    setSpeedInStepsPerSecond(speedInMillimetersPerSecond * _stepsPerMillimeter);
+}
+
+void MtsStepper::setAccelerationInMillimetersPerSecondPerSecond(
+    float accelerationInMillimetersPerSecondPerSecond)
+{
+    setAccelerationInStepsPerSecondPerSecond(accelerationInMillimetersPerSecondPerSecond * _stepsPerMillimeter);
+}
+
+bool MtsStepper::moveToHomeInMillimeters(long directionTowardHome,float speedInMillimetersPerSecond, long maxDistanceToMoveInMillimeters,int homeLimitSwitchPin)
+{
+    return(moveToHomeInSteps(directionTowardHome,
+        speedInMillimetersPerSecond * _stepsPerMillimeter,
+        maxDistanceToMoveInMillimeters * _stepsPerMillimeter,
+        homeLimitSwitchPin));
+}
+
+void MtsStepper::setTargetPositionRelativeInMillimeters(float distanceToMoveInMillimeters)
+{
+    setTargetPositionRelativeInSteps((long)round(distanceToMoveInMillimeters * _stepsPerMillimeter));
+}
+
+void MtsStepper::setTargetPositionInMillimeters(float absolutePositionToMoveToInMillimeters)
+{
+    setTargetPositionInSteps((long)round(absolutePositionToMoveToInMillimeters * _stepsPerMillimeter));
+}
+
+float MtsStepper::getCurrentVelocityInMillimetersPerSecond()
+{
+    return(getCurrentVelocityInStepsPerSecond() / _stepsPerMillimeter);
+}
+
+
+
+// Revolutions
+
+void MtsStepper::setStepsPerRevolution(float motorStepPerRevolution)
+{
+    _stepsPerRevolution = motorStepPerRevolution;
+}
+
+void MtsStepper::setCurrentPositionInRevolutions(float currentPositionInRevolutions)
+{
+    setCurrentPositionInSteps((long)round(currentPositionInRevolutions * _stepsPerRevolution));
+}
+
+void MtsStepper::setSpeedInRevolutionsPerSecond(float speedInRevolutionsPerSecond)
+{
+    setSpeedInStepsPerSecond(speedInRevolutionsPerSecond * _stepsPerRevolution);
+}
+
+void MtsStepper::setAccelerationInRevolutionsPerSecondPerSecond(float accelerationInRevolutionsPerSecondPerSecond)
+{
+    setAccelerationInStepsPerSecondPerSecond(accelerationInRevolutionsPerSecondPerSecond * _stepsPerRevolution);
+}
+
+bool MtsStepper::moveToHomeInRevolutions(long directionTowardHome, float speedInRevolutionsPerSecond, long maxDistanceToMoveInRevolutions, int homeLimitSwitchPin)
+{
+    return(moveToHomeInSteps(directionTowardHome,
+        speedInRevolutionsPerSecond * _stepsPerRevolution,
+        maxDistanceToMoveInRevolutions * _stepsPerRevolution,
+        homeLimitSwitchPin));
+}
+
+void MtsStepper::setTargetPositionRelativeInRevolutions(float distanceToMoveInRevolutions)
+{
+    setTargetPositionRelativeInSteps((long)round(distanceToMoveInRevolutions * _stepsPerRevolution));
+}
+
+void MtsStepper::setTargetPositionInRevolutions(float absolutePositionToMoveToInRevolutions)
+{
+    setTargetPositionInSteps((long)round(absolutePositionToMoveToInRevolutions * _stepsPerRevolution));
+}
+
+float MtsStepper::getCurrentVelocityInRevolutionsPerSecond()
+{
+    return(getCurrentVelocityInStepsPerSecond() / _stepsPerRevolution);
+}
+
+float MtsStepper::getCurrentPositionInRevolutions()
+{
+    return((float)getCurrentPositionInSteps() / _stepsPerRevolution);
+}
+
+
+
+// General
+
+bool MtsStepper::motionComplete()
+{
+    if ((_directionOfMotion == 0) && (_currentPosition_InSteps == _targetPosition_InSteps)) {
+        return(true);
+    }
+
+    return(false);
+}
+
+void MtsStepper::deadStop()
+{
+    _directionOfMotion = 0;
+    _targetPosition_InSteps = _currentPosition_InSteps;
+}
+
+void MtsStepper::disable()
+{
+    deadStop();
+    processStep(-1, _stepperType);
+}
 
 //
 // home the motor by moving until the homing sensor is activated, then set the 
@@ -85,7 +221,6 @@ long MtsStepper::getCurrentPositionInSteps()
 //            configured to go low when at home
 //  Exit:   true returned if successful, else false
 //
-/*
 bool MtsStepper::moveToHomeInSteps(long directionTowardHome,
     float speedInStepsPerSecond, long maxDistanceToMoveInSteps,
     int homeLimitSwitchPin)
@@ -98,28 +233,23 @@ bool MtsStepper::moveToHomeInSteps(long directionTowardHome,
     //
     pinMode(homeLimitSwitchPin, INPUT_PULLUP);
 
-
     //
     // remember the current speed setting
     //
     originalDesiredSpeed_InStepsPerSecond = _desiredSpeed_InStepsPerSecond;
 
-
     //
     // if the home switch is not already set, move toward it
     //
-    if (digitalRead(homeLimitSwitchPin) == HIGH)
-    {
+    if (digitalRead(homeLimitSwitchPin) == HIGH) {
         //
         // move toward the home switch
         //
         setSpeedInStepsPerSecond(speedInStepsPerSecond);
         setTargetPositionRelativeInSteps(maxDistanceToMoveInSteps * directionTowardHome);
         limitSwitchFlag = false;
-        while (!processMovement())
-        {
-            if (digitalRead(homeLimitSwitchPin) == LOW)
-            {
+        while (!process()) {
+            if (digitalRead(homeLimitSwitchPin) == LOW) {
                 limitSwitchFlag = true;
                 _directionOfMotion = 0;
                 break;
@@ -134,14 +264,13 @@ bool MtsStepper::moveToHomeInSteps(long directionTowardHome,
     }
     delay(25);
 
-
     //
     // the switch has been detected, now move away from the switch
     //
     setTargetPositionRelativeInSteps(maxDistanceToMoveInSteps *
         directionTowardHome * -1);
     limitSwitchFlag = false;
-    while (!processMovement())
+    while (!process())
     {
         if (digitalRead(homeLimitSwitchPin) == HIGH)
         {
@@ -155,9 +284,9 @@ bool MtsStepper::moveToHomeInSteps(long directionTowardHome,
     //
     // check if switch never detected
     //
-    if (limitSwitchFlag == false)
+    if (limitSwitchFlag == false) {
         return(false);
-
+    }
 
     //
     // have now moved off the switch, move toward it again but slower
@@ -165,10 +294,8 @@ bool MtsStepper::moveToHomeInSteps(long directionTowardHome,
     setSpeedInStepsPerSecond(speedInStepsPerSecond / 8);
     setTargetPositionRelativeInSteps(maxDistanceToMoveInSteps * directionTowardHome);
     limitSwitchFlag = false;
-    while (!processMovement())
-    {
-        if (digitalRead(homeLimitSwitchPin) == LOW)
-        {
+    while (!process()) {
+        if (digitalRead(homeLimitSwitchPin) == LOW) {
             limitSwitchFlag = true;
             _directionOfMotion = 0;
             break;
@@ -179,9 +306,9 @@ bool MtsStepper::moveToHomeInSteps(long directionTowardHome,
     //
     // check if switch never detected
     //
-    if (limitSwitchFlag == false)
+    if (limitSwitchFlag == false) {
         return(false);
-
+    }
 
     //
     // successfully homed, set the current position to 0
@@ -194,43 +321,43 @@ bool MtsStepper::moveToHomeInSteps(long directionTowardHome,
     setSpeedInStepsPerSecond(originalDesiredSpeed_InStepsPerSecond);
     return(true);
 }
-*/
 
 
 
-/*
-bool MtsStepper::processStep(int8_t &currentStepPhase)
+bool MtsStepper::process()
 {
     unsigned long currentTime_InUS;
     unsigned long periodSinceLastStep_InUS;
     long distanceToTarget_Signed;
 
-
     //
     // check if currently stopped
     //
-    if (_directionOfMotion == 0)
-    {
+    if (_directionOfMotion == 0) {
         distanceToTarget_Signed = _targetPosition_InSteps - _currentPosition_InSteps;
 
-        //return false if no movement necessary
-        if (distanceToTarget_Signed == 0) {
-            return(false);
-        } 
-        else if (distanceToTarget_Signed > 0)
-        {
+        //
+        // check if target position in a positive direction
+        //
+        if (distanceToTarget_Signed > 0) {
             _directionOfMotion = 1;
             _nextStepPeriod_InUS = _periodOfSlowestStep_InUS;
-            _lastStepTime_InUS = micros();
+            _lastStepTime_InUS = 0;
         }
-        else if (distanceToTarget_Signed < 0)
-        {
+
+        //
+        // check if target position in a negative direction
+        //
+        else if (distanceToTarget_Signed < 0) {
             _directionOfMotion = -1;
             _nextStepPeriod_InUS = _periodOfSlowestStep_InUS;
-            _lastStepTime_InUS = micros();
+            _lastStepTime_InUS = 0;
         }
-    }
 
+        else {
+            return(true);
+        }   
+    }
 
     //
     // determine how much time has elapsed since the last step (Note 1: this method   
@@ -239,27 +366,18 @@ bool MtsStepper::processStep(int8_t &currentStepPhase)
     currentTime_InUS = micros();
     periodSinceLastStep_InUS = currentTime_InUS - _lastStepTime_InUS;
 
-
     //
     // if it is not time for the next step, return
     //
-    if (periodSinceLastStep_InUS < (unsigned long)_nextStepPeriod_InUS)
+    if (periodSinceLastStep_InUS < (unsigned long)_nextStepPeriod_InUS) {
         return(false);
-
+    }
+        
 
     //
     // execute the step
-    //setNextFullStep();
-    
-
-    _stepPhase += (-_directionOfMotion);
-    if (_stepPhase <= -1) {
-        _stepPhase = 3;
-    }
-    if (_stepPhase >= 4) {
-        _stepPhase = 0;
-    }
-    currentStepPhase = _stepPhase;
+    //
+    setNextStep();
 
     //
     // update the current position and speed
@@ -281,22 +399,46 @@ bool MtsStepper::processStep(int8_t &currentStepPhase)
     // check if the move has reached its final target position, return true if all 
     // done
     //
-    if (_currentPosition_InSteps == _targetPosition_InSteps)
-    {
+    if (_currentPosition_InSteps == _targetPosition_InSteps) {
         //
         // at final position, make sure the motor is not going too fast
         //
-        if (_nextStepPeriod_InUS >= _minimumPeriodForAStoppedMotion)
-        {
+        if (_nextStepPeriod_InUS >= _minimumPeriodForAStoppedMotion) {
             _currentStepPeriod_InUS = 0.0;
             _nextStepPeriod_InUS = 0.0;
             _directionOfMotion = 0;
+            return(true);
         }
     }
 
-    return(true);
+    return(false);
 }
 
+
+
+void MtsStepper::setNextStep()
+{
+    _stepPhase += (-_directionOfMotion);
+
+    if (_stepType == MTS_STEPPER_FULL_STEP) {
+        if (_stepPhase <= -1) {
+            _stepPhase = 3;
+        }
+        if (_stepPhase >= 4) {
+            _stepPhase = 0;
+        }   
+    } 
+    else if (_stepType == MTS_STEPPER_HALF_STEP) {
+        if (_stepPhase <= -1) {
+            _stepPhase = 3;
+        }
+        if (_stepPhase >= 8) {
+            _stepPhase = 0;
+        }
+    }
+
+    processStep(_stepPhase, _stepType);
+}
 
 void MtsStepper::DeterminePeriodOfNextStep()
 {
@@ -443,4 +585,3 @@ void MtsStepper::DeterminePeriodOfNextStep()
             _nextStepPeriod_InUS = _periodOfSlowestStep_InUS;
     }
 }
-*/

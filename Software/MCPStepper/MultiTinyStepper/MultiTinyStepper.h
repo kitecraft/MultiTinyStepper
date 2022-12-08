@@ -1,4 +1,8 @@
 #pragma once
+
+// This stepper motor driver is based on the original FlexyStepper project by S. Reifel & Co 
+// https://github.com/Stan-Reifel/FlexyStepper
+
 #include <Arduino.h>
 #include <Wire.h>
 #include "MCP23017.h"
@@ -7,6 +11,18 @@
 #define MCP23017_DEFAULT_ADDR 0x20
 #define MTS_STEPPER_COUNT 4
 
+enum MTS_STEPPER_PHASE {
+	MTS_STEPPER_PHASE_1 = 0,
+	MTS_STEPPER_PHASE_2,
+	MTS_STEPPER_PHASE_3,
+	MTS_STEPPER_PHASE_4,
+	MTS_STEPPER_PHASE_5,
+	MTS_STEPPER_PHASE_6,
+	MTS_STEPPER_PHASE_7,
+	MTS_STEPPER_PHASE_8,
+
+	MTS_STEPPER_PHASE_DISABLE = -1
+};
 
 class MultiTinyStepper
 {

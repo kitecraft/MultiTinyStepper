@@ -112,6 +112,9 @@ uint8_t MultiTinyStepper::getFullStepForPhase(uint8_t phase)
 	uint8_t ret = 0;
 
 	switch (phase) {
+	case MTS_STEPPER_PHASE_DISABLE:
+		ret = 0b0000;
+		break;
 	case MTS_STEPPER_PHASE_1:
 		ret = 0b1100;
 		break;
@@ -134,6 +137,9 @@ uint8_t MultiTinyStepper::getHalfStepForPhase(uint8_t phase)
 	uint8_t ret = 0;
 
 	switch (phase) {
+	case MTS_STEPPER_PHASE_DISABLE:
+		ret = 0b0000;
+		break;
 	case MTS_STEPPER_PHASE_1:
 		ret = 0b1100;
 		break;
