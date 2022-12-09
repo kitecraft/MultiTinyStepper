@@ -2,7 +2,7 @@
 
 MtsStepper::MtsStepper()
 {
-    _stepType = MTS_STEPPER_FULL_STEP;
+    _stepSize = MTS_STEPPER_FULL_STEP;
     _stepsPerRevolution = MTS_STEPPER_TYPE_16_REV;
     _stepsPerMillimeter = 25.0;
     _directionOfMotion = 0;
@@ -22,6 +22,11 @@ void MtsStepper::setType(int type)
 
     _stepsPerRevolution = MTS_STEPPER_TYPE_16_REV;
     _stepperType = type;
+}
+
+void MtsStepper::setStepSize(MTS_STEPPER_STEP_TYPE stepSize)
+{
+    _stepSize = stepSize;
 }
 
 
@@ -420,7 +425,7 @@ void MtsStepper::setNextStep()
 {
     _stepPhase += (-_directionOfMotion);
 
-    if (_stepType == MTS_STEPPER_FULL_STEP) {
+    if (_stepSize == MTS_STEPPER_FULL_STEP) {
         if (_stepPhase <= -1) {
             _stepPhase = 3;
         }
@@ -428,16 +433,16 @@ void MtsStepper::setNextStep()
             _stepPhase = 0;
         }   
     } 
-    else if (_stepType == MTS_STEPPER_HALF_STEP) {
+    else if (_stepSize == MTS_STEPPER_HALF_STEP) {
         if (_stepPhase <= -1) {
-            _stepPhase = 3;
+            _stepPhase = 7;
         }
         if (_stepPhase >= 8) {
             _stepPhase = 0;
         }
     }
 
-    processStep(_stepPhase, _stepType);
+    processStep(_stepPhase, _stepSize);
 }
 
 void MtsStepper::DeterminePeriodOfNextStep()

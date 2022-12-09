@@ -29,7 +29,7 @@ class MtsStepper
 private:
     void DeterminePeriodOfNextStep();
     processStepHandler processStep = nullptr;
-    MTS_STEPPER_STEP_TYPE _stepType;
+    MTS_STEPPER_STEP_TYPE _stepSize;
     uint8_t _stepperType;
     void setNextStep();
 
@@ -60,7 +60,8 @@ public:
     MTS_STEPPER_TYPE_16 = 513
     */
     void setType(int type);
-
+    
+    void setStepSize(MTS_STEPPER_STEP_TYPE stepSize);
 
     // Functions which use Steps
 

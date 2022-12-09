@@ -19,7 +19,7 @@ void setup() {
 	Serial.begin(115200);
 	Serial.println("\n\nStarting....");
 	
-	Wire.begin(4, 5);
+	Wire.begin(4, 5, 1000000);
 	Serial.print("Clock: ");
 	Serial.println(Wire.getClock());
 	//Wire.setClock(100000);
@@ -34,14 +34,18 @@ void setup() {
 	stepper4 = g_stepperController.getStepper(MTS_STEPPER_4);
 
 	stepper1->setType(MTS_STEPPER_TYPE_64);
-	stepper1->setSpeedInStepsPerSecond(200);
-	stepper1->setAccelerationInStepsPerSecondPerSecond(200);
+	stepper1->setSpeedInStepsPerSecond(600);
+	stepper1->setAccelerationInStepsPerSecondPerSecond(600);
 	stepper1->setCurrentPositionInSteps(0);
+	stepper1->setStepSize(MTS_STEPPER_HALF_STEP);
+
 
 	stepper2->setType(MTS_STEPPER_TYPE_64);
-	stepper2->setSpeedInStepsPerSecond(400);
-	stepper2->setAccelerationInStepsPerSecondPerSecond(400);
+	stepper2->setSpeedInStepsPerSecond(600);
+	stepper2->setAccelerationInStepsPerSecondPerSecond(600);
 	stepper2->setCurrentPositionInSteps(0);
+	stepper2->setStepSize(MTS_STEPPER_FULL_STEP);
+	
 
 	stepper3->setType(MTS_STEPPER_TYPE_64);
 	stepper3->setSpeedInStepsPerSecond(600);
@@ -61,15 +65,15 @@ void loop() {
 	Serial.println("Going");
 	stepper1->setTargetPositionInSteps(2000);
 	stepper2->setTargetPositionInSteps(2000);
-	stepper3->setTargetPositionInSteps(2000);
-	stepper4->setTargetPositionInSteps(2000);
+	//stepper3->setTargetPositionInSteps(2000);
+	//stepper4->setTargetPositionInSteps(2000);
 	
 	while (!complete) {
 		bool a = stepper1->process();
 		bool b = stepper2->process();
-		bool c = stepper3->process();
-		bool d = stepper4->process();
-		if (a && b && c && d) {
+		//bool c = stepper3->process();
+		//bool d = stepper4->process();
+		if (a && b) {
 			complete = true;
 		}
 	}
@@ -79,17 +83,18 @@ void loop() {
 	complete = false;
 	stepper1->setTargetPositionInSteps(0);
 	stepper2->setTargetPositionInSteps(0);
-	stepper3->setTargetPositionInSteps(0);
-	stepper4->setTargetPositionInSteps(0);
+	//stepper3->setTargetPositionInSteps(0);
+	//stepper4->setTargetPositionInSteps(0);
 
 	while (!complete) {
 		bool a = stepper1->process();
 		bool b = stepper2->process();
-		bool c = stepper3->process();
-		bool d = stepper4->process();
-		if (a && b && c && d) {
+		//bool c = stepper3->process();
+		//bool d = stepper4->process();
+		if (a && b) {
 			complete = true;
 		}
 	}
+
 	delay(1000);
 }
