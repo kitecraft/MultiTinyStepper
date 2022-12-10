@@ -1,9 +1,10 @@
 #pragma once
+
+//This is a shortened version of https://github.com/blemasle/arduino-mcp23017
+//Original author: blemasle
+
 #include <Arduino.h>
 #include <Wire.h>
-
-#define _MCP23017_INTERRUPT_SUPPORT_ ///< Enables support for MCP23017 interrupts.
-#define MCP23017_INT_ERR 255 //!< Interrupt error
 
 enum class MCP23017Port : uint8_t
 {
