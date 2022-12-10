@@ -39,6 +39,7 @@ public:
     Sets the stepsPerRevolution for the appropriate stepper type
     MTS_STEPPER_TYPE_64 = 2038
     MTS_STEPPER_TYPE_16 = 513
+    stepSize can be either MTS_STEPPER_FULL_STEP or MTS_STEPPER_HALF_STEP
 
     */
     void setStepperType(MTS_STEPPER_TYPE type, MTS_STEPPER_STEP_SIZE stepSize);
