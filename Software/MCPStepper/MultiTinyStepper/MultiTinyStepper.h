@@ -33,6 +33,11 @@ private:
 	portMUX_TYPE _mutex;
 public:
 	MultiTinyStepper() {}
+
+	/*
+	Init the I2C with a 1Mhz freq to get maximum stepper speed
+	example: Wire.begin(sda, scl, 1000000);
+	*/
 	void begin(TwoWire& wire, int address = MCP23017_DEFAULT_ADDR);
 
 	/*
