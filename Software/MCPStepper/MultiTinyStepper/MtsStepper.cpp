@@ -14,19 +14,27 @@ MtsStepper::MtsStepper()
     _nextStepPeriod_InUS = 0.0;
 }
 
-void MtsStepper::setType(int type)
+void MtsStepper::setStepperType(MTS_STEPPER_TYPE type, MTS_STEPPER_STEP_SIZE stepSize)
 {
-    if (type == MTS_STEPPER_TYPE_64) {
-        _stepsPerRevolution = MTS_STEPPER_TYPE_64_REV;
-    }
-
-    _stepsPerRevolution = MTS_STEPPER_TYPE_16_REV;
     _stepperType = type;
-}
-
-void MtsStepper::setStepSize(MTS_STEPPER_STEP_TYPE stepSize)
-{
     _stepSize = stepSize;
+
+    if (_stepperType == MTS_STEPPER_TYPE_64) {
+        if (_stepSize == MTS_STEPPER_FULL_STEP) {
+            _stepsPerRevolution = MTS_STEPPER_TYPE_64_REV;
+        }
+        else if (_stepSize == MTS_STEPPER_HALF_STEP) {
+            _stepsPerRevolution = MTS_STEPPER_TYPE_64_REV * 2;
+        }
+    }
+    else if (_stepperType == MTS_STEPPER_TYPE_16) {
+        if (_stepSize == MTS_STEPPER_FULL_STEP) {
+            _stepsPerRevolution = MTS_STEPPER_TYPE_16_REV;
+        }
+        else if (_stepSize == MTS_STEPPER_HALF_STEP) {
+            _stepsPerRevolution = MTS_STEPPER_TYPE_16_REV * 2;
+        }
+    }
 }
 
 
@@ -175,7 +183,8 @@ void MtsStepper::setTargetPositionRelativeInRevolutions(float distanceToMoveInRe
 
 void MtsStepper::setTargetPositionInRevolutions(float absolutePositionToMoveToInRevolutions)
 {
-    setTargetPositionInSteps((long)round(absolutePositionToMoveToInRevolutions * _stepsPerRevolution));
+    long val = (long)round(absolutePositionToMoveToInRevolutions * _stepsPerRevolution);
+    setTargetPositionInSteps(val);
 }
 
 float MtsStepper::getCurrentVelocityInRevolutionsPerSecond()

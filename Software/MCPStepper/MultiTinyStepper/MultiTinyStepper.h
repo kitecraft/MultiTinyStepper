@@ -6,23 +6,9 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "MCP23017.h"
+#include "MultiTinyStepper_Config.h"
 #include "MtsStepper.h"
 
-#define MCP23017_DEFAULT_ADDR 0x20
-#define MTS_STEPPER_COUNT 4
-
-enum MTS_STEPPER_PHASE {
-	MTS_STEPPER_PHASE_1 = 0,
-	MTS_STEPPER_PHASE_2,
-	MTS_STEPPER_PHASE_3,
-	MTS_STEPPER_PHASE_4,
-	MTS_STEPPER_PHASE_5,
-	MTS_STEPPER_PHASE_6,
-	MTS_STEPPER_PHASE_7,
-	MTS_STEPPER_PHASE_8,
-
-	MTS_STEPPER_PHASE_DISABLE = -1
-};
 
 class MultiTinyStepper
 {
@@ -49,14 +35,10 @@ public:
 	MultiTinyStepper() {}
 	void begin(TwoWire& wire, int address = MCP23017_DEFAULT_ADDR);
 
-
 	/*
 	* Get a handle to a stepper.
 	* Do not delete it.
 	*/
 	MtsStepper* getStepper(MTS_STEPPER_ID stepperId);
-
-	//void disableAllMotors();
-
 };
 

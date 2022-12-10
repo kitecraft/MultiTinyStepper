@@ -2,40 +2,21 @@
 #include <Arduino.h>
 #include <functional>
 #include <stdlib.h>
-
-#define MTS_STEPPER_TYPE_16_REV 513
-#define MTS_STEPPER_TYPE_64_REV 2038
-
-#define MTS_STEPPER_TYPE_16 0
-#define MTS_STEPPER_TYPE_64 1
-
-
-enum MTS_STEPPER_ID {
-    MTS_STEPPER_1 = 0,
-    MTS_STEPPER_2,
-    MTS_STEPPER_3,
-    MTS_STEPPER_4
-};
-
-enum MTS_STEPPER_STEP_TYPE {
-    MTS_STEPPER_FULL_STEP = 0,
-    MTS_STEPPER_HALF_STEP
-};
+#include "MultiTinyStepper_Config.h"
 
 typedef std::function<void(uint8_t, uint8_t)> processStepHandler;
-
 class MtsStepper
 {
 private:
     void DeterminePeriodOfNextStep();
     processStepHandler processStep = nullptr;
-    MTS_STEPPER_STEP_TYPE _stepSize;
-    uint8_t _stepperType;
+    MTS_STEPPER_STEP_SIZE _stepSize;
+    MTS_STEPPER_TYPE _stepperType;
     void setNextStep();
 
     int8_t _stepPhase;
     float _stepsPerMillimeter;
-    int8_t _stepsPerRevolution;
+    float _stepsPerRevolution;
     int _directionOfMotion;
     long _currentPosition_InSteps;
     long _targetPosition_InSteps;
@@ -58,10 +39,10 @@ public:
     Sets the stepsPerRevolution for the appropriate stepper type
     MTS_STEPPER_TYPE_64 = 2038
     MTS_STEPPER_TYPE_16 = 513
+
     */
-    void setType(int type);
+    void setStepperType(MTS_STEPPER_TYPE type, MTS_STEPPER_STEP_SIZE stepSize);
     
-    void setStepSize(MTS_STEPPER_STEP_TYPE stepSize);
 
     // Functions which use Steps
 
