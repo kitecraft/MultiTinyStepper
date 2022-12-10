@@ -4,8 +4,8 @@
  Author:	Kitecraft
 */
 
-#include "MultiTinyStepper/MultiTinyStepper.h"
-#include "MultiTinyStepper/MtsStepper.h"
+#include <MultiTinyStepper.h>
+#include <MtsStepper.h>
 
 MultiTinyStepper g_stepperController;
 MtsStepper* stepper1;
