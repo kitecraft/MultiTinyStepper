@@ -5,7 +5,6 @@
 */
 
 #include <MultiTinyStepper.h>
-#include <MtsStepper.h>
 
 MultiTinyStepper g_stepperController;
 MtsStepper* stepper1;
@@ -47,7 +46,7 @@ void setup() {
 	stepper3->setCurrentPositionInSteps(0);
 
 	//Serial.println("\nStepper 4");
-	stepper4->setStepperType(MTS_STEPPER_TYPE_64, MTS_STEPPER_HALF_STEP);
+	stepper4->setStepperType(MTS_STEPPER_TYPE_16, MTS_STEPPER_HALF_STEP);
 	stepper4->setSpeedInStepsPerSecond(800);
 	stepper4->setAccelerationInStepsPerSecondPerSecond(800);
 	stepper4->setCurrentPositionInSteps(0);

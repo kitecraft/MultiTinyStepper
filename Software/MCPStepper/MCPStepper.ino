@@ -31,27 +31,22 @@ void setup() {
 	stepper1->setStepperType(MTS_STEPPER_TYPE_64, MTS_STEPPER_FULL_STEP);
 	stepper1->setSpeedInStepsPerSecond(600);
 	stepper1->setAccelerationInStepsPerSecondPerSecond(600);
-	stepper1->setCurrentPositionInSteps(0);
 
 	//Serial.println("\nStepper 2");
 	stepper2->setStepperType(MTS_STEPPER_TYPE_64, MTS_STEPPER_HALF_STEP);
 	stepper2->setSpeedInStepsPerSecond(800);
 	stepper2->setAccelerationInStepsPerSecondPerSecond(800);
-	stepper2->setCurrentPositionInSteps(0);
 	
 	//Serial.println("\nStepper 3");
 	stepper3->setStepperType(MTS_STEPPER_TYPE_16, MTS_STEPPER_FULL_STEP);
 	stepper3->setStepsPerMillimeter(10);
 	stepper3->setSpeedInMillimetersPerSecond(30);
 	stepper3->setAccelerationInMillimetersPerSecondPerSecond(30);
-	stepper3->setCurrentPositionInSteps(0);
 
 	//Serial.println("\nStepper 4");
 	stepper4->setStepperType(MTS_STEPPER_TYPE_64, MTS_STEPPER_HALF_STEP);
 	stepper4->setSpeedInStepsPerSecond(800);
 	stepper4->setAccelerationInStepsPerSecondPerSecond(800);
-	stepper4->setCurrentPositionInSteps(0);
-
 }
 
 // the loop function runs over and over again until power down or reset
@@ -77,7 +72,7 @@ void loop() {
 	stepper1->setTargetPositionInSteps(0); // will spin in reverse
 	stepper2->setTargetPositionInRevolutions(0); // will spin in reverse
 	stepper3->setTargetPositionInMillimeters(0); // will spin in reverse
-	stepper4->setTargetPositionRelativeInSteps(MTS_STEPPER_TYPE_64_REV); //will always spin foward
+	stepper4->setTargetPositionRelativeInSteps(MTS_STEPPER_TYPE_64_REV); //will still spin foward
 	while (!complete) {
 		bool a = stepper1->process();
 		bool b = stepper2->process();

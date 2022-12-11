@@ -104,7 +104,6 @@ public:
     //Call this when needing to move.  Returns true if movement complete. 
     bool process();
 
-
     /*
     DO NOT CALL THIS! It is used by MultiTinyStepper
     */
