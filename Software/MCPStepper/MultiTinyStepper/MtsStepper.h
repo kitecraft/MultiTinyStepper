@@ -4,10 +4,11 @@
 #include <stdlib.h>
 #include "MultiTinyStepper_Config.h"
 
-typedef std::function<void(uint8_t, uint8_t)> processStepHandler;
+typedef std::function<void(uint8_t, uint8_t, bool)> processStepHandler;
 class MtsStepper
 {
 private:
+    bool _reversed = false;
     void DeterminePeriodOfNextStep();
     processStepHandler processStep = nullptr;
     MTS_STEPPER_STEP_SIZE _stepSize;
@@ -39,11 +40,10 @@ public:
     Sets the stepsPerRevolution for the appropriate stepper type
     MTS_STEPPER_TYPE_64 = 2038
     MTS_STEPPER_TYPE_16 = 513
-    stepSize can be either MTS_STEPPER_FULL_STEP or MTS_STEPPER_HALF_STEP
 
     */
     void setStepperType(MTS_STEPPER_TYPE type, MTS_STEPPER_STEP_SIZE stepSize);
-    
+    void setReversed(bool reversed) { _reversed = reversed; }
 
     // Functions which use Steps
 
@@ -103,6 +103,7 @@ public:
 
     //Call this when needing to move.  Returns true if movement complete. 
     bool process();
+
 
     /*
     DO NOT CALL THIS! It is used by MultiTinyStepper

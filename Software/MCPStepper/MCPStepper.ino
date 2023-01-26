@@ -19,7 +19,8 @@ void setup() {
 	Serial.begin(115200);
 	Serial.println("\n\nStarting....");
 	
-	Wire.begin(4, 5, 1000000);
+	Wire.begin();
+	Wire.setClock(700000);
 	g_stepperController.begin(Wire, MCP23017_DEFAULT_ADDR);
 
 	stepper1 = g_stepperController.getStepper(MTS_STEPPER_1);
@@ -36,6 +37,7 @@ void setup() {
 	stepper2->setStepperType(MTS_STEPPER_TYPE_64, MTS_STEPPER_HALF_STEP);
 	stepper2->setSpeedInStepsPerSecond(800);
 	stepper2->setAccelerationInStepsPerSecondPerSecond(800);
+	stepper2->setReversed(true);
 	
 	//Serial.println("\nStepper 3");
 	stepper3->setStepperType(MTS_STEPPER_TYPE_16, MTS_STEPPER_FULL_STEP);
@@ -47,6 +49,7 @@ void setup() {
 	stepper4->setStepperType(MTS_STEPPER_TYPE_64, MTS_STEPPER_HALF_STEP);
 	stepper4->setSpeedInStepsPerSecond(800);
 	stepper4->setAccelerationInStepsPerSecondPerSecond(800);
+	stepper4->setReversed(true);
 }
 
 // the loop function runs over and over again until power down or reset
