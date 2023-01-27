@@ -1,8 +1,11 @@
 #include "MultiTinyStepper.h"
 
-void MultiTinyStepper::begin(TwoWire& wire, int address)
+void MultiTinyStepper::begin(TwoWire& wire, int8_t resetPin, int address)
 {
 	_mutex = portMUX_INITIALIZER_UNLOCKED;
+	_resetPin = resetPin;
+	pinMode(_resetPin, OUTPUT);
+	Reset();
 
 	_mcp.init(address, wire);
 	_mcp.portMode(MCP23017Port::A, 0);
@@ -26,6 +29,14 @@ void MultiTinyStepper::begin(TwoWire& wire, int address)
 		processStepper4(data, stepType, reversed);
 		});
 }
+
+void MultiTinyStepper::Reset()
+{
+	digitalWrite(_resetPin, LOW);
+	delay(200);
+	digitalWrite(_resetPin, HIGH);
+}
+
 
 MtsStepper* MultiTinyStepper::getStepper(MTS_STEPPER_ID stepperId)
 {

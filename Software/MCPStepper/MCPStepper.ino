@@ -21,7 +21,7 @@ void setup() {
 	
 	Wire.begin();
 	Wire.setClock(700000);
-	g_stepperController.begin(Wire, MCP23017_DEFAULT_ADDR);
+	g_stepperController.begin(Wire, -1, MCP23017_DEFAULT_ADDR);
 
 	stepper1 = g_stepperController.getStepper(MTS_STEPPER_1);
 	stepper2 = g_stepperController.getStepper(MTS_STEPPER_2);
