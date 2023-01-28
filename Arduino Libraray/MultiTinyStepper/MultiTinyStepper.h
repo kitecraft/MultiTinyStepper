@@ -15,6 +15,8 @@ class MultiTinyStepper
 private:
 	MCP23017 _mcp;
 	MtsStepper _steppers[MTS_STEPPER_COUNT];
+	int8_t _resetPin = -1;
+	void Reset();
 
 	uint8_t _portA = 0;
 	uint8_t _portB = 0;
@@ -38,7 +40,7 @@ private:
 	portMUX_TYPE _mutex;
 public:
 	MultiTinyStepper() {}
-	void begin(TwoWire& wire, int address = MCP23017_DEFAULT_ADDR);
+	void begin(TwoWire& wire, int8_t resetPin = -1, int address = MCP23017_DEFAULT_ADDR);
 
 	/*
 	* Get a handle to a stepper.
